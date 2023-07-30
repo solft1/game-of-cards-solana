@@ -1,0 +1,57 @@
+use rand::seq::SliceRandom;
+use std::io;
+
+const CARD_VALUES: [&str; 13] = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+fn main() {
+    println!("Welcome to the Card Reveal Game!");
+
+    // Create a standard deck of cards
+    let mut deck = create_deck();
+
+    // Shuffle the deck
+    deck.shuffle(&mut rand::thread_rng());
+
+    let mut score = 0;
+    let total_cards = deck.len();
+
+    for card in deck.iter() {
+        println!("Guess the value of the card (2-10, J, Q, K, A): ");
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input.");
+
+        // Trim the input to remove any leading/trailing whitespaces or newlines
+        let guessed_value = input.trim().to_uppercase();
+
+        if CARD_VALUES.contains(&&*guessed_value) {
+            let actual_value = card.to_uppercase();
+            println!("Card revealed: {}", actual_value);
+
+            if guessed_value == actual_value {
+                println!("Correct!");
+                score += 1;
+            } else {
+                println!("Incorrect. The correct value was: {}", actual_value);
+            }
+
+            println!("Current score: {}/{}", score, total_cards);
+            println!("-----------------------");
+        } else {
+            println!("Invalid input. Please enter a valid card value.");
+        }
+    }
+
+    println!("Game Over! Your final score: {}/{}", score, total_cards);
+}
+
+fn create_deck() -> Vec<&'static str> {
+    let mut deck: Vec<&str> = Vec::new();
+    for _ in 0..4 {
+        for &value in CARD_VALUES.iter() {
+            deck.push(value);
+        }
+    }
+    deck
+}
